@@ -1,0 +1,29 @@
+version: "3"
+services:
+#Caddy reverse proxy
+  proxy:
+    image: abiosoft/caddy
+    container_name: jenkins-caddy
+    hostname: jenkins-caddy
+    ports:
+      - "443:443"
+      - "80:80"
+    depends_on:
+      - jenkins
+    restart: unless-stopped
+    volumes:
+      - ./caddyfile:/etc/Caddyfile
+      - ./caddy:/root/.caddy
+    environment:
+      - ACME_AGREE=true
+#Jenkins container
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    hostname: jenkins
+    restart: unless-stopped
+    volumes:
+      - ./jenkins:/var/jenkins_home
+    environment:
+      - JAVA_OPTS=-Dhudson.model.ParametersAction.safeParameters=abortDuplicatePipelineMode -Xmx4g -XX:MaxPermSize=512m -Djava.awt.headless=true -XX:+UseG1GC -Duser.timezone="Europe/Moscow"
+                  -Dhudson.model.DirectoryBrowserSupport.CSP="sandbox allow-scripts; default-src 'self'; script-src * 'unsafe-eval' 'unsafe-inline'; img-src *; style-src * 'unsafe-inline'; font-src * data:"

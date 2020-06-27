@@ -1,0 +1,6 @@
+your-domain.ru {
+  tls your-email@your-domain.ru
+  proxy / jenkins:8080 {
+    transparent
+  }
+}
